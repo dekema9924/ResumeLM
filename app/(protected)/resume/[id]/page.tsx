@@ -6,16 +6,30 @@ import ScoreCard from '@/components/ui/ScoreCard'
 import bg from '@/public/assets/public/images/bg-main.svg'
 import { useResumeStore } from '@/store/resume-store'
 import { useParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { getResume } from '@/lib/server/prisma-actions'
+import ScoreAccordian from '@/components/ui/ScoreAccordian'
 
 function Resumepage() {
     const resumes = useResumeStore((state) => state.resumes)
+    const setResumes = useResumeStore((state) => state.setResumes)
     const { id } = useParams()
-
     const findResume = resumes.find(element => element.id === id)
+
+
+    // persist data 
+    useEffect(() => {
+        if (resumes.length === 0) {
+            getResume().then((data) => {
+                setResumes(data?.data ?? [])
+            })
+
+        }
+    }, [])
 
     return (
         <div className="h-screen flex flex-col overflow-hiddenN">
-            <ResumeHeader />
+            <ResumeHeader job_title={findResume?.jobTitle ?? ""} />
 
             <main
                 className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden"
@@ -33,7 +47,7 @@ function Resumepage() {
 
                         {/* Preview Header */}
                         <div className="px-6 py-4 border-b border-slate-100 shrink-0">
-                            <h2 className="text-lg font-semibold text-slate-800">
+                            <h2 className=" text-lg font-semibold text-slate-800">
                                 Resume Preview
                             </h2>
                             <p className="text-sm text-slate-500">
@@ -59,9 +73,10 @@ function Resumepage() {
 
                 {/* RIGHT SIDE */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6 ">
-                    <h1 className=' font-bold text-3xl py-6'>Resume Review</h1>
+                    <h1 className=' gradient-text font-bold text-3xl py-6'>Resume Review</h1>
                     <ScoreCard />
                     <AtsScore />
+                    <ScoreAccordian />
                 </div>
             </main>
         </div>

@@ -64,10 +64,14 @@ export const Signin = async (email: string, password: string) => {
 
 export const Signout = async () => {
     try {
-        await auth.api.signOut({
+        const res = await auth.api.signOut({
             // This endpoint requires session cookies.
             headers: await headers(),
         });
+        if (res.success) {
+            await auth.api.revokeSessions()
+        }
+
         return { success: true }
     } catch (err) {
         console.error(err);
