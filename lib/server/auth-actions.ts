@@ -1,7 +1,5 @@
 'use server'
 import { prisma } from "@/lib/server/prisma"
-
-
 import { BaseUrl } from "@/config/config";
 import { auth } from "./auth";
 import { headers } from "next/headers";
@@ -18,8 +16,6 @@ export const Signup = async (name: string, email: string, password: string) => {
             throw new Error("user with email already exists")
         }
 
-
-
         const res = await auth.api.signUpEmail({
             body: {
                 name: name,
@@ -33,7 +29,6 @@ export const Signup = async (name: string, email: string, password: string) => {
     } catch (err: any) {
         console.error("Signup error:", err);
         throw err
-        // return null;
     }
 
 }
@@ -68,11 +63,7 @@ export const Signout = async () => {
             // This endpoint requires session cookies.
             headers: await headers(),
         });
-        if (res.success) {
-            await auth.api.revokeSessions()
-        }
-
-        return { success: true }
+        if (res.success) return { success: true }
     } catch (err) {
         console.error(err);
         throw err;

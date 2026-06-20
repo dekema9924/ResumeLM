@@ -7,7 +7,7 @@ export default function LogoffButton() {
     const HandleSignOut = async () => {
         try {
             const res = await Signout()
-            if (res.success) {
+            if (res?.success) {
                 toast.success("logout successfull!")
                 window.location.reload()
             }
