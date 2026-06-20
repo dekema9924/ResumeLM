@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ChangeEvent } from 'react';
+import toast from "react-hot-toast";
 
 
 
@@ -14,32 +15,44 @@ type uploadType = {
 function UploadResume({ file, setFile }: uploadType) {
     const inputRef = useRef<HTMLInputElement>(null)
 
-
     //activate useref
     const handleInputClick = () => {
         inputRef.current?.click();
     }
 
-
     //assign file in usestate
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
 
-        if (files && files.length > 0) {
-            const selectedFile = files[0];
-            const maxSize = 10 * 1024 * 1024; // 10 MB
+        const selectedFile = files?.[0]
 
-            if (selectedFile.size > maxSize) {
-                alert("File must be smaller than 10MB");
-                setFile(null)
+        if (!selectedFile) return
 
-                if (inputRef.current) {
-                    inputRef.current.value = "";
-                }
-                return;
+        if (selectedFile.type !== "application/pdf") {
+            toast.error("Only PDF files are allowed")
+            setFile(null)
+
+            if (inputRef.current) {
+                inputRef.current.value = ""
             }
-            setFile(selectedFile)
+
+            return
         }
+
+        const maxSize = 2 * 1024 * 1024 // 2MB
+
+        if (selectedFile.size > maxSize) {
+            toast.error("File must be smaller than 2MB")
+            setFile(null)
+
+            if (inputRef.current) {
+                inputRef.current.value = ""
+            }
+
+            return
+        }
+
+        setFile(selectedFile)
     };
 
     return (
@@ -63,11 +76,10 @@ function UploadResume({ file, setFile }: uploadType) {
                 </p>
 
                 <p className="text-gray-400 text-xs mt-1">
-                    PDF, DOC, DOCX (max. 10MB)
+                    PDFS ONLY  (max. 2MB)
                 </p>
 
-                <input accept=".pdf, .doc, .docx, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document
-                "typeof="pdf" onChange={handleFileChange} className="hidden" ref={inputRef} type="file" name="resume-file" />
+                <input accept="application/pdf" onChange={handleFileChange} className="hidden" ref={inputRef} type="file" name="resume-file" />
                 <span>{file?.name}</span>
 
 

@@ -1,29 +1,23 @@
 'use client'
 
-import { Document, Page } from 'react-pdf'
+import { Document, Page, pdfjs } from 'react-pdf'
 import { useState } from 'react'
-import { pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/TextLayer.css';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css'
+import 'react-pdf/dist/Page/AnnotationLayer.css'
 
+pdfjs.GlobalWorkerOptions.workerSrc =
+    `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url,
-).toString()
-
-export default function FilePreview({ url }: { url: string }) {
+export default function FilePreview({ url, width }: { url: string, width: number }) {
     const [numPages, setNumPages] = useState<number>()
 
     return (
-        <div className="shadow-lg rounded-lg overflow-hidden h-70">
-            <Document
-                file={url}
-                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-            >
-                <Page pageNumber={1} width={300} />
-            </Document>
-        </div>
+        <Document
+            file={url}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            onLoadError={(error) => console.error(error)}
+        >
+            <Page pageNumber={1} width={width} />
+        </Document>
     )
 }

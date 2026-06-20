@@ -14,21 +14,29 @@ datasource db {
 
 model Resume {
   id             String   @id @default(cuid())
-  name           String   // The uploaded PDF file name
-  filePath       String   // The Supabase storage tracking key
-  userId         String   
+  name           String
+  filePath       String
+  userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
-  
+
   // Job Target Metadata
   company        String
   jobTitle       String
-  jobDescription String   
+  jobDescription String   @db.Text
 
-  //AI Generation Features:
-  aiReview       String?  @db.Text // Stores the raw AI breakdown feedback text
-  coverLetter    String?  @db.Text // Stores the generated cover letter text
-  status         String   @default("PENDING") // Tracks progress: PENDING, ANALYZED, FAILED
+  // AI Analysis Results
+  atsScore           Int?
+  atsIssueCount      Int?
+  items              Json?    // [{ label, badge, score }]
+  atsIssues          Json?    // [{ section, severity, problem, fix }]
+  jobFitScore        Int?
+  jobFitSummary      String?  @db.Text
+  missingKeywords    Json?    // string[]
+  matchingStrengths  Json?    // string[]
+  feedback           Json?    // string[]
+  coverLetter        String?  @db.Text
+  status             String   @default("PENDING") // PENDING, ANALYZED, FAILED
 }
 
 model User {

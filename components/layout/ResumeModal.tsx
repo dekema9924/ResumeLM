@@ -11,10 +11,9 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { useState } from "react";
 import { uploadToSupabase } from "@/lib/client/uploadToSupabase";
 import { useIsLoggedIn } from "@/hooks/useIsLoggedIn";
-import { saveResumeToDatabase } from "@/lib/server/prisma-actions";
+import { saveResumeToDatabase, updateResumeAnalysis } from "@/lib/server/prisma-actions";
 import toast from "react-hot-toast";
-
-
+import { useResumeStore } from "@/store/resume-store";
 
 type Inputs = {
     company_name: string
@@ -31,6 +30,8 @@ const mona_sans = Mona_Sans({
 export default function ResumeModal() {
     const [file, setFile] = useState<File | null>(null)
     const { session } = useIsLoggedIn()
+    const addResume = useResumeStore((state) => state.addResume)
+    const updateResume = useResumeStore((state) => state.updateResume)
     const { isUploadBtnClicked, setUploadBtnClicked } = useUploadModal();
     const {
         register,
@@ -42,6 +43,7 @@ export default function ResumeModal() {
 
         const res = await uploadToSupabase(file, session.user.id)
 
+        console.log(res?.signedUrl)
         if (res?.signedUrl) {
             const saveresume = await saveResumeToDatabase({
                 fileName: file.name,
@@ -50,19 +52,62 @@ export default function ResumeModal() {
                 jobTitle: data.job_title,
                 jobDescription: data.job_description
             })
+
             if (!saveresume) return
+
             if (saveresume.success) {
+                addResume(saveresume.resume)
                 toast.success("Resume loaded...Analyzing")
                 setUploadBtnClicked(false)
+
+                // 1. Extract text from the uploaded PDF
+                try {
+                    const formData = new FormData()
+                    formData.append("file", file)
+
+                    const extractRes = await fetch('/api/extract-pdf', {
+                        method: "POST",
+                        body: formData,
+                    })
+                    const dataObj = await extractRes.json()
+
+                    if (dataObj.text) {
+                        // 2. Send extracted text + job context to the AI for analysis
+                        const aiRes = await fetch('/api/claude', {
+                            method: 'POST',
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                extractedText: dataObj.text,
+                                company: data.company_name,
+                                jobTitle: data.job_title,
+                                jobDescription: data.job_description
+                            })
+                        })
+
+                        if (!aiRes.ok) {
+                            toast.error("AI analysis failed.")
+                            return
+                        }
+
+                        const aiResult = await aiRes.json()
+                        console.log(aiResult)
+
+                        // 3. Save the AI's review back onto the resume record
+                        const updated = await updateResumeAnalysis(saveresume.resume.id, aiResult)
+
+                        if (updated?.data) {
+                            updateResume(updated.data)
+                            toast.success("Analysis complete!")
+                        } else {
+                            toast.error("Failed to save AI analysis.")
+                        }
+                    }
+                } catch (err) {
+                    console.error(err)
+                    toast.error("Something went wrong during analysis.")
+                }
             }
         }
-
-
-
-
-
-
-
     }
 
     useEffect(() => {
@@ -154,8 +199,8 @@ export default function ResumeModal() {
                         text={isSubmitting ? "Analyzing Resume..." : "Save & Analyze Resume"}
                         disabled={isSubmitting}
                         className={`h-13 w-full my-14 text-lg font-semibold transition-all ${isSubmitting
-                                ? "opacity-70 cursor-not-allowed"
-                                : "hover:shadow-lg"
+                            ? "opacity-70 cursor-not-allowed"
+                            : "hover:shadow-lg"
                             }`}
                     />
                 </div>

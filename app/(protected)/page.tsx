@@ -7,34 +7,23 @@ import Btn from "@/components/ui/Btn";
 import Link from "next/link";
 import { getResume } from "@/lib/server/prisma-actions";
 import { useEffect, useState } from "react";
-
+import { useResumeStore } from "@/store/resume-store";
+import Loading from "@/Loadng";
+import { Resume as r } from "@/generated/prisma/client";
 const mona_sans = Mona_Sans({
   weight: "600",
   subsets: ["latin"],
 });
 
+export type ResumeType = r
 
-type ResumeType = {
-  id: string
-  name: string
-  filePath: string
-  userId: string
 
-  company: string
-  jobTitle: string
-  jobDescription: string
-
-  status: string
-
-  aiReview: string | null
-  coverLetter: string | null
-
-  createdAt: Date
-}
 
 export default function Home() {
   const { setUploadBtnClicked } = useUploadModal()
-  const [resumeArr, setResumeArr] = useState<ResumeType[]>([])
+  const resumes = useResumeStore((state) => state.resumes)
+  const setResumes = useResumeStore((state) => state.setResumes)
+  const [isLoading, setIsLoading] = useState(true)
 
 
   useEffect(() => {
@@ -42,7 +31,8 @@ export default function Home() {
     const loadResume = async () => {
       const res = await getResume()
       if (res) {
-        setResumeArr(res.data)
+        setResumes(res.data)
+        setIsLoading(false)
       }
     }
 
@@ -84,24 +74,35 @@ export default function Home() {
 
 
         <div
-          className="mx-auto w-full max-w-425 px-4 sm:px-6 lg:px-8 mt-40 md:mt-20 lg:mt-50 pb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
+          className="mx-auto w-full max-w-425 px-4 sm:px-6 lg:px-8 mt-40 md:mt-20 lg:mt-60 pb-20 grid grid-cols-1 sm:grid-cols-2 gap-10
+           lg:grid-cols-3 xl:grid-cols-4 "
         >
 
-          {resumeArr.map((resume: ResumeType) => {
+          {resumes?.map((resume: ResumeType) => {
             return (
               <div key={resume.id}>
-                <Link href={`/resume/${resume.name}/${resume.id}`}>
-                  <Resume
-                    company_name={resume.company}
-                    job_title={resume.jobTitle}
-                  />
+                <Link href={`/resume/${resume.id}`}>
+                  {resume.atsScore !== null ? (
+                    <Resume
+                      company_name={resume.company}
+                      job_title={resume.jobTitle}
+                      previewUrl={resume.filePath}
+                      percentage={resume.atsScore}
+                    />
+                  ) : (
+                    <div>ATS analysis pending...</div>
+                  )}
                 </Link>
               </div>
             );
           })}
         </div>
 
-        {resumeArr.length <= 0 && (
+        {
+          isLoading && <Loading />
+        }
+
+        {resumes.length <= 0 && (
           <div className="flex flex-col items-center justify-center  text-center">
             <div className="text-6xl mb-4">📄</div>
 
@@ -114,6 +115,8 @@ export default function Home() {
             </p>
           </div>
         )}
+
+
       </main>
     </>
   );

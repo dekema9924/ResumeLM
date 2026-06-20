@@ -5,26 +5,41 @@ import FilePreview from './FilePreview'
 type ResumeType = {
     company_name: string
     job_title: string
-    // percentage: number
+    previewUrl: string
+    percentage: number
 }
 
-export default function Resume({ company_name, job_title }: ResumeType) {
+export default function Resume({ company_name, job_title, previewUrl, percentage }: ResumeType) {
     return (
-        <div className='w-90 h-100  p-5 bg-white border border-blue-100 md:border-0 rounded-2xl m-auto'>
-            <div className='flex items-center justify-between'>
-                <div>
-                    <h1 className='font-bold text-xl'>{company_name}</h1>
-                    <span className='text-md text-gray-600'>{job_title}</span>
+        <div className="w-10/12 md:w-72 p-5 bg-white border border-blue-100 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 m-auto">
+
+            {/* Header */}
+            <div className="flex items-start justify-between gap-3">
+
+                <div className="flex-1">
+                    <h1 className="font-semibold text-lg text-gray-900 truncate">
+                        {company_name}
+                    </h1>
+
+                    <span className="text-sm text-gray-500">
+                        {job_title}
+                    </span>
                 </div>
 
-                <CircularProgressBar percentage={30} />
+                <div className="shrink-0">
+                    <CircularProgressBar percentage={percentage} />
+                </div>
+            </div>
 
+            {/* Divider */}
+            {/* <div className="my-4 h-px bg-gray-100" /> */}
+
+            {/* PDF Preview */}
+            <div className="rounded-xl h-50 overflow-hidden border border-gray-100 shadow-sm bg-gray-50">
+                <FilePreview url={previewUrl} width={360} />
             </div>
 
 
-
-
-            <FilePreview url='https://itdwcxtstaygnnvtgrwc.supabase.co/storage/v1/object/sign/resume-files/Sid6gCJ5BGc3eS5bqpOayuHX4V8liDcf/1781415460027_AI_Resume_Guide.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MjQ1MzE1MS1iMWVjLTQyZGQtOGM0ZS0xY2ZjMmNhNzg3YzUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJyZXN1bWUtZmlsZXMvU2lkNmdDSjVCR2MzZVM1YnFwT2F5dUhYNFY4bGlEY2YvMTc4MTQxNTQ2MDAyN19BSV9SZXN1bWVfR3VpZGUucGRmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTQxNTQ2MCwiZXhwIjoxNzgxNDE5MDYwfQ.8ndVE30Jzt5O7I97JszO5lc4AHYwGOR9rABgmItT0NE' />
         </div>
     )
 }

@@ -23,7 +23,7 @@ export async function uploadToSupabase(file: File, userId: string) {
     // 2. Signed URL
     const { data: signed, error: signedError } = await supabase.storage
         .from('resume-files')
-        .createSignedUrl(filePath, 60 * 60)
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7)
 
     if (signedError) {
         console.error('Signed URL error:', signedError)
