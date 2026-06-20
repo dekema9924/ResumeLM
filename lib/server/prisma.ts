@@ -1,10 +1,13 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client";
-
+// import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@/generated/prisma/client"
 
 
 
 const connectionString = process.env.DATABASE_URL;
+
+const dbUrl = process.env.DATABASE_URL;
+console.log("DB URL host check:", dbUrl ? new URL(dbUrl).host : "MISSING");
 
 if (!connectionString) {
     throw new Error("DATABASE_URL is not defined");
