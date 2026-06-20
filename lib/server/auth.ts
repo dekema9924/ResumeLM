@@ -32,6 +32,12 @@ export const auth = betterAuth({
                     to: user.email,
                     subject: "Verify your email address",
                     text: `Click the link to verify your email: ${url}`,
+                    html: `
+                    <h2>Verify your email</h2>
+                    <p>Click the button below to verify your email address:</p>
+                    <a href="${url}">
+                    Verify Email
+                    </a> `,
                 });
 
                 console.log("email sent");
@@ -40,6 +46,11 @@ export const auth = betterAuth({
             }
         }
     },
+
+    trustedOrigins: [
+        "http://localhost:3000",
+        "https://resume-lm-taupe.vercel.app",
+    ],
 
 
 
