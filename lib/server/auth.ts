@@ -51,7 +51,7 @@ export const auth = betterAuth({
 
     trustedOrigins: [
         "http://localhost:3000",
-        "https://resume-lm-taupe.vercel.app",
+        "https://resume-lm-swart.vercel.app",
     ],
 
 
