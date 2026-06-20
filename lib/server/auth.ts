@@ -4,12 +4,14 @@ import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { transporter } from "./nodemailer";
 import { nextCookies } from "better-auth/next-js";
+import { BaseUrl } from "@/config/config";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
 })
 
 export const auth = betterAuth({
+    baseURL: BaseUrl,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
