@@ -20,8 +20,6 @@ export default function AtsScore() {
     const resumes = useResumeStore((state) => state.resumes);
     const findResume = resumes.find((r) => r.id === id);
 
-    console.log(resumes)
-
     if (!findResume) {
         return (
             <section className={`flex flex-col bg-linear-to-b from-green-100/60 to-green-100/10 mt-10 p-4 shadow-2xl rounded-2xl gap-4`}>

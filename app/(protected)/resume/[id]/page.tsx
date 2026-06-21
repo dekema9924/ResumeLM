@@ -16,23 +16,21 @@ function Resumepage() {
     const { id } = useParams()
     const findResume = resumes.find(element => element.id === id)
 
-
-    // persist data 
     useEffect(() => {
         if (resumes.length === 0) {
             getResume().then((data) => {
                 setResumes(data?.data ?? [])
             })
-
         }
     }, [])
 
     return (
-        <div className="h-screen flex flex-col overflow-hiddenN">
+        // h-screen/overflow-hidden only kicks in at md+, mobile is a normal scrolling page
+        <div className="min-h-screen md:h-screen flex flex-col md:overflow-hidden">
             <ResumeHeader job_title={findResume?.jobTitle ?? ""} />
 
             <main
-                className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden"
+                className="flex-1 md:min-h-0 flex flex-col md:flex-row md:overflow-hidden"
                 style={{ backgroundImage: `url("${bg}")` }}
             >
                 {/* LEFT SIDE - PDF PREVIEW */}
@@ -41,13 +39,14 @@ function Resumepage() {
                     bg-slate-50 border-r border-slate-200
                     p-4 md:p-6
                     flex flex-col
-                    h-[50vh] md:h-auto
+                    h-[65vh] md:h-auto
+                    shrink-0
                 ">
                     <div className="flex-1 min-h-0 rounded-3xl bg-white shadow-sm border border-slate-200 overflow-hidden flex flex-col">
 
                         {/* Preview Header */}
                         <div className="px-6 py-4 border-b border-slate-100 shrink-0">
-                            <h2 className=" text-lg font-semibold text-slate-800">
+                            <h2 className="text-lg font-semibold text-slate-800">
                                 Resume Preview
                             </h2>
                             <p className="text-sm text-slate-500">
@@ -72,8 +71,8 @@ function Resumepage() {
                 </div>
 
                 {/* RIGHT SIDE */}
-                <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6 ">
-                    <h1 className=' gradient-text font-bold text-3xl py-6'>Resume Review</h1>
+                <div className="flex-1 md:min-h-0 overflow-visible md:overflow-y-auto p-4 md:p-6">
+                    <h1 className="gradient-text font-bold text-3xl py-6">Resume Review</h1>
                     <ScoreCard />
                     <AtsScore />
                     <ScoreAccordian />

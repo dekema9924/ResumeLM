@@ -25,7 +25,6 @@ function SignIn_page() {
         const res = await Signin(data.email, data.password);
 
         if (!res.success) {
-            console.log(res)
             setErr(res.code)
             if (res.code === "EMAIL_NOT_VERIFIED") {
                 await resendVerificationEmail(data.email)

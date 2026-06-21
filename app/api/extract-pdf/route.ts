@@ -7,8 +7,6 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get('file');
 
-        console.log(file)
-
         // 1. Guard check: Ensure file exists AND is a File object, not a string
         if (!file || !(file instanceof File)) {
             return NextResponse.json(

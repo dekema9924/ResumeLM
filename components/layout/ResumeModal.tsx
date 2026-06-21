@@ -43,7 +43,6 @@ export default function ResumeModal() {
 
         const res = await uploadToSupabase(file, session.user.id)
 
-        console.log(res?.signedUrl)
         if (res?.signedUrl) {
             const saveresume = await saveResumeToDatabase({
                 fileName: file.name,
@@ -90,7 +89,6 @@ export default function ResumeModal() {
                         }
 
                         const aiResult = await aiRes.json()
-                        console.log(aiResult)
 
                         // 3. Save the AI's review back onto the resume record
                         const updated = await updateResumeAnalysis(saveresume.resume.id, aiResult)

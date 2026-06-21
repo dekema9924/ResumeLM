@@ -4,8 +4,6 @@ export const POST = async (req: NextRequest) => {
     try {
         const { extractedText, company, jobTitle, jobDescription } = await req.json();
 
-        console.log(extractedText, company, jobTitle, jobDescription)
-
         if (!extractedText) {
             return NextResponse.json({ error: "No text content provided." }, { status: 400 });
         }
