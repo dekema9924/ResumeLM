@@ -5,11 +5,17 @@ import { Mona_Sans } from "next/font/google";
 import { useUploadModal } from "@/context/ModalContext";
 import Btn from "@/components/ui/Btn";
 import Link from "next/link";
-import { getResume } from "@/lib/server/prisma-actions";
-import { useEffect, useState } from "react";
+import { deleteResume, getResume } from "@/lib/server/prisma-actions";
+import { useEffect, useState, useTransition } from "react";
 import { useResumeStore } from "@/store/resume-store";
 import Loading from "@/Loadng";
 import { Resume as r } from "@/generated/prisma/client";
+import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation'
+
+
+
+
 const mona_sans = Mona_Sans({
   weight: "600",
   subsets: ["latin"],
@@ -24,6 +30,11 @@ export default function Home() {
   const resumes = useResumeStore((state) => state.resumes)
   const setResumes = useResumeStore((state) => state.setResumes)
   const [isLoading, setIsLoading] = useState(true)
+  const removeResume = useResumeStore((state) => state.removeResume)
+  const [isPending, startTransition] = useTransition()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const router = useRouter()
+
 
 
   useEffect(() => {
@@ -39,6 +50,22 @@ export default function Home() {
     loadResume()
 
   }, [])
+
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm('Delete this resume? This can\'t be undone.')
+    if (!confirmed) return
+
+    setDeletingId(id)
+    startTransition(async () => {
+      const result = await deleteResume(id)
+      removeResume(id)
+      if (!result?.success) {
+        toast.error('Failed to delete resume. Please try again.')
+      }
+      toast.success("Item delete")
+      setDeletingId(null)
+    })
+  }
 
 
 
@@ -80,19 +107,23 @@ export default function Home() {
 
           {resumes?.map((resume: ResumeType) => {
             return (
-              <div key={resume.id}>
-                <Link href={`/resume/${resume.id}`}>
-                  {resume.atsScore !== null ? (
-                    <Resume
-                      company_name={resume.company}
-                      job_title={resume.jobTitle}
-                      previewUrl={resume.filePath}
-                      percentage={resume.atsScore}
-                    />
-                  ) : (
-                    <div>ATS analysis pending...</div>
-                  )}
-                </Link>
+              <div
+                key={resume.id}
+                onClick={() => router.push(`/resume/${resume.id}`)}
+                className="cursor-pointer"
+              >
+                {resume.atsScore !== null ? (
+                  <Resume
+                    isDeleting={deletingId === resume.id}
+                    company_name={resume.company}
+                    job_title={resume.jobTitle}
+                    previewUrl={resume.filePath}
+                    percentage={resume.atsScore}
+                    onDelete={() => handleDelete(resume.id)}
+                  />
+                ) : (
+                  <div>ATS analysis pending...</div>
+                )}
               </div>
             );
           })}

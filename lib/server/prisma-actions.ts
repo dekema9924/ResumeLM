@@ -4,6 +4,7 @@
 import { prisma } from "@/lib/server/prisma"
 import { auth } from "@/lib/server/auth"
 import { headers } from "next/headers"
+import { success } from "better-auth"
 
 
 type ResumeType = {
@@ -110,5 +111,21 @@ export async function updateResumeAnalysis(resumeId: string, aiResult: AiAnalysi
     } catch (err) {
         console.error(err)
         return { error: "Failed to update resume." }
+    }
+}
+
+
+export const deleteResume = async (id: string) => {
+    if (!id) throw new Error('ID value missing')
+
+    try {
+        await prisma.resume.delete({
+            where: { id }
+        })
+
+        return { success: true }
+    } catch (err) {
+        console.error(err)
+        return { success: false, error: 'Failed to delete resume' }
     }
 }
