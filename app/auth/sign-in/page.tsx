@@ -24,8 +24,10 @@ function SignIn_page() {
     const onSubmit: SubmitHandler<inputType> = async (data) => {
         const res = await Signin(data.email, data.password);
 
+
         if (!res.success) {
             setErr(res.code)
+            console.log(res.err)
             if (res.code === "EMAIL_NOT_VERIFIED") {
                 await resendVerificationEmail(data.email)
                 router.push(

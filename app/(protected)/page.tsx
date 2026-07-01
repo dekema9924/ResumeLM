@@ -4,7 +4,7 @@ import UserAvatar from "@/components/ui/UserAvatar";
 import { Mona_Sans } from "next/font/google";
 import { useUploadModal } from "@/context/ModalContext";
 import Btn from "@/components/ui/Btn";
-import Link from "next/link";
+
 import { deleteResume, getResume } from "@/lib/server/prisma-actions";
 import { useEffect, useState, useTransition } from "react";
 import { useResumeStore } from "@/store/resume-store";

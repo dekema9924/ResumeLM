@@ -51,6 +51,7 @@ export const Signin = async (email: string, password: string) => {
         return {
             success: false,
             code: error?.body?.code,
+            err: error
         };
     }
 };
